@@ -8,9 +8,9 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { User, UserRole } from '../domain/entities/user.entity';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
-import { User, UserRole } from './entities/user.entity';
 
 interface JwtPayload {
   sub: number;
