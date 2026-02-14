@@ -1,6 +1,5 @@
-import {
+﻿import {
   IsEmail,
-  IsIn,
   IsNotEmpty,
   IsString,
   Matches,
@@ -25,9 +24,4 @@ export class CreateAuthDto {
   @MinLength(2, { message: 'name must be at least 2 characters long' })
   @MaxLength(50, { message: 'name must be at most 50 characters long' })
   name: string;
-
-  @IsIn(['admin', 'counselor'], {
-    message: 'role must be either admin or counselor',
-  })
-  role: 'admin' | 'counselor';
 }

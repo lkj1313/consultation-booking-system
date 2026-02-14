@@ -1,10 +1,9 @@
-export type UserRole = 'admin' | 'counselor';
+export type UserRole = 'admin';
 
 export interface RegisterUserPayload {
   email: string;
   password: string;
   name: string;
-  role: UserRole;
 }
 
 export interface RegisterUserResponse {

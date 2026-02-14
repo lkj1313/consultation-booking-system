@@ -2,6 +2,12 @@ import { Migration } from '@mikro-orm/migrations';
 
 export class Migration20260214000100 extends Migration {
   override up(): Promise<void> {
+    this.addSql("create type \"users_role\" as enum ('admin', 'counselor');");
+    this.addSql(
+      'create table "users" ("id" serial primary key, "email" varchar(255) not null, "password_hash" varchar(255) not null, "name" varchar(50) not null, "role" "users_role" not null default \'admin\', "created_at" timestamptz not null, "updated_at" timestamptz not null);',
+    );
+    this.addSql('create unique index "users_email_unique" on "users" ("email");');
+
     this.addSql(
       "create type \"counselor_schedule_slots_status\" as enum ('open', 'closed', 'cancelled');",
     );
@@ -83,9 +89,11 @@ export class Migration20260214000100 extends Migration {
     this.addSql('drop table if exists "bookings" cascade;');
     this.addSql('drop table if exists "booking_link_tokens" cascade;');
     this.addSql('drop table if exists "counselor_schedule_slots" cascade;');
+    this.addSql('drop table if exists "users" cascade;');
 
     this.addSql('drop type if exists "bookings_status";');
     this.addSql('drop type if exists "counselor_schedule_slots_status";');
+    this.addSql('drop type if exists "users_role";');
     return Promise.resolve();
   }
 }

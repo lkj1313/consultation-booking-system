@@ -1,4 +1,4 @@
-import {
+﻿import {
   Collection,
   Entity,
   Enum,
@@ -39,21 +39,15 @@ export class User {
   name!: string;
 
   @Enum(() => UserRole)
-  role: UserRole = UserRole.COUNSELOR;
+  role: UserRole = UserRole.ADMIN;
 
-  @OneToMany(
-    () => CounselorScheduleSlot,
-    (slot: CounselorScheduleSlot) => slot.counselor,
-  )
+  @OneToMany(() => CounselorScheduleSlot, (slot: CounselorScheduleSlot) => slot.counselor)
   scheduleSlots = new Collection<CounselorScheduleSlot>(this);
 
   @OneToMany(() => ConsultationNote, (note: ConsultationNote) => note.counselor)
   consultationNotes = new Collection<ConsultationNote>(this);
 
-  @OneToMany(
-    () => BookingLinkToken,
-    (token: BookingLinkToken) => token.counselor,
-  )
+  @OneToMany(() => BookingLinkToken, (token: BookingLinkToken) => token.counselor)
   bookingLinkTokens = new Collection<BookingLinkToken>(this);
 
   @OneToMany(() => Booking, (booking: Booking) => booking.createdByCounselor, {

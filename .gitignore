@@ -25,3 +25,7 @@ Thumbs.db
 Microsoft/
 .turbo/
 .pnpm-store/
+
+# local docs
+docs/HANDOFF.md
+docs/ORIGINAL_REQUIREMENTS.md

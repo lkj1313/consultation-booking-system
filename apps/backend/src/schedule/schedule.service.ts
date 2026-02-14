@@ -1,15 +1,11 @@
-import { EntityRepository } from '@mikro-orm/core';
+﻿import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   CounselorScheduleSlot,
   CounselorScheduleSlotStatus,
 } from '../domain/entities/counselor-schedule-slot.entity';
-import { User, UserRole } from '../domain/entities/user.entity';
+import { User } from '../domain/entities/user.entity';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { FindSchedulesDto } from './dto/find-schedules.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
@@ -29,9 +25,6 @@ export class ScheduleService {
     const counselor = await this.userRepository.findOne({ id: dto.counselorId });
     if (!counselor) {
       throw new NotFoundException('상담사를 찾을 수 없습니다.');
-    }
-    if (counselor.role !== UserRole.COUNSELOR) {
-      throw new BadRequestException('상담사 계정만 스케줄을 가질 수 있습니다.');
     }
 
     const duplicated = await this.slotRepository.findOne({
@@ -89,16 +82,13 @@ export class ScheduleService {
     this.validateTimeSlot(nextStartAt, nextEndAt);
 
     if (dto.capacity !== undefined && dto.capacity < slot.bookedCount) {
-      throw new BadRequestException('현재 예약 수보다 작은 인원으로 수정할 수 없습니다.');
+      throw new BadRequestException('현재 예약 수보다 적은 정원으로 수정할 수 없습니다.');
     }
 
     if (dto.counselorId !== undefined && dto.counselorId !== slot.counselor.id) {
       const counselor = await this.userRepository.findOne({ id: dto.counselorId });
       if (!counselor) {
         throw new NotFoundException('상담사를 찾을 수 없습니다.');
-      }
-      if (counselor.role !== UserRole.COUNSELOR) {
-        throw new BadRequestException('상담사 계정만 스케줄을 가질 수 있습니다.');
       }
       slot.counselor = counselor;
     }

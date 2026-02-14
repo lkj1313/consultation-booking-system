@@ -1,4 +1,4 @@
-import {
+﻿import {
   Body,
   Controller,
   Get,
@@ -29,7 +29,7 @@ export class BookingController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.COUNSELOR)
+  @Roles(UserRole.ADMIN)
   findBookings(@Query() query: FindBookingsDto) {
     return this.bookingService.findBookings(query);
   }
@@ -41,14 +41,14 @@ export class BookingController {
 
   @Patch(':id/cancel')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.COUNSELOR)
+  @Roles(UserRole.ADMIN)
   cancel(@Param('id', ParseIntPipe) id: number) {
     return this.bookingService.cancel(id);
   }
 
   @Patch(':id/complete')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.COUNSELOR)
+  @Roles(UserRole.ADMIN)
   complete(@Param('id', ParseIntPipe) id: number) {
     return this.bookingService.complete(id);
   }

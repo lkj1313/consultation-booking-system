@@ -4,6 +4,87 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@eslint/js':
+      specifier: ^9.39.1
+      version: 9.39.2
+    '@tailwindcss/vite':
+      specifier: ^4.1.18
+      version: 4.1.18
+    '@tanstack/react-query':
+      specifier: ^5.90.21
+      version: 5.90.21
+    '@types/node':
+      specifier: ^24.10.1
+      version: 24.10.13
+    '@types/react':
+      specifier: ^19.2.7
+      version: 19.2.14
+    '@types/react-dom':
+      specifier: ^19.2.3
+      version: 19.2.3
+    '@vitejs/plugin-react':
+      specifier: ^5.1.1
+      version: 5.1.4
+    axios:
+      specifier: ^1.13.5
+      version: 1.13.5
+    class-variance-authority:
+      specifier: ^0.7.1
+      version: 0.7.1
+    clsx:
+      specifier: ^2.1.1
+      version: 2.1.1
+    date-fns:
+      specifier: ^4.1.0
+      version: 4.1.0
+    eslint:
+      specifier: ^9.39.1
+      version: 9.39.2
+    eslint-plugin-react-hooks:
+      specifier: ^7.0.1
+      version: 7.0.1
+    eslint-plugin-react-refresh:
+      specifier: ^0.4.24
+      version: 0.4.26
+    globals:
+      specifier: ^16.5.0
+      version: 16.5.0
+    react:
+      specifier: ^19.2.0
+      version: 19.2.4
+    react-day-picker:
+      specifier: ^9.11.1
+      version: 9.13.2
+    react-dom:
+      specifier: ^19.2.0
+      version: 19.2.4
+    react-router-dom:
+      specifier: ^7.13.0
+      version: 7.13.0
+    react-toastify:
+      specifier: ^11.0.5
+      version: 11.0.5
+    tailwind-merge:
+      specifier: ^3.4.0
+      version: 3.4.0
+    tailwindcss:
+      specifier: ^4.1.18
+      version: 4.1.18
+    typescript:
+      specifier: ~5.9.3
+      version: 5.9.3
+    typescript-eslint:
+      specifier: ^8.48.0
+      version: 8.55.0
+    vite:
+      specifier: ^7.3.1
+      version: 7.3.1
+    zustand:
+      specifier: ^5.0.11
+      version: 5.0.11
+
 importers:
 
   .:
@@ -21,50 +102,50 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.71.1(react@19.2.4))
       '@tanstack/react-query':
-        specifier: ^5.90.21
+        specifier: 'catalog:'
         version: 5.90.21(react@19.2.4)
       axios:
-        specifier: ^1.13.5
+        specifier: 'catalog:'
         version: 1.13.5
       class-variance-authority:
-        specifier: ^0.7.1
+        specifier: 'catalog:'
         version: 0.7.1
       clsx:
-        specifier: ^2.1.1
+        specifier: 'catalog:'
         version: 2.1.1
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
       react:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
       react-hook-form:
         specifier: ^7.71.1
         version: 7.71.1(react@19.2.4)
       react-router-dom:
-        specifier: ^7.13.0
+        specifier: 'catalog:'
         version: 7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react-toastify:
-        specifier: ^11.0.5
+        specifier: 'catalog:'
         version: 11.0.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       tailwind-merge:
-        specifier: ^3.4.0
+        specifier: 'catalog:'
         version: 3.4.0
       zod:
         specifier: ^4.3.6
         version: 4.3.6
       zustand:
-        specifier: ^5.0.11
+        specifier: 'catalog:'
         version: 5.0.11(@types/react@19.2.14)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
     devDependencies:
       '@eslint/js':
-        specifier: ^9.39.1
+        specifier: 'catalog:'
         version: 9.39.2
       '@storybook/addon-a11y':
         specifier: ^8.6.14
@@ -79,46 +160,46 @@ importers:
         specifier: ^8.6.14
         version: 8.6.14(@storybook/test@8.6.14(storybook@8.6.14(prettier@3.8.1)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(rollup@4.57.1)(storybook@8.6.14(prettier@3.8.1))(typescript@5.9.3)(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.0))
       '@tailwindcss/vite':
-        specifier: ^4.1.18
+        specifier: 'catalog:'
         version: 4.1.18(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.0))
       '@types/node':
-        specifier: ^24.10.1
+        specifier: 'catalog:'
         version: 24.10.13
       '@types/react':
-        specifier: ^19.2.7
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
-        specifier: ^5.1.1
+        specifier: 'catalog:'
         version: 5.1.4(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.0))
       eslint:
-        specifier: ^9.39.1
+        specifier: 'catalog:'
         version: 9.39.2(jiti@2.6.1)
       eslint-plugin-react-hooks:
-        specifier: ^7.0.1
+        specifier: 'catalog:'
         version: 7.0.1(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-react-refresh:
-        specifier: ^0.4.24
+        specifier: 'catalog:'
         version: 0.4.26(eslint@9.39.2(jiti@2.6.1))
       globals:
-        specifier: ^16.5.0
+        specifier: 'catalog:'
         version: 16.5.0
       storybook:
         specifier: 8.6.14
         version: 8.6.14(prettier@3.8.1)
       tailwindcss:
-        specifier: ^4.1.18
+        specifier: 'catalog:'
         version: 4.1.18
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.48.0
+        specifier: 'catalog:'
         version: 8.55.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       vite:
-        specifier: ^7.3.1
+        specifier: 'catalog:'
         version: 7.3.1(@types/node@24.10.13)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.0)
 
   apps/applicant-web:
@@ -127,65 +208,68 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared-ui
       '@tanstack/react-query':
-        specifier: ^5.90.21
+        specifier: 'catalog:'
         version: 5.90.21(react@19.2.4)
       axios:
-        specifier: ^1.13.5
+        specifier: 'catalog:'
         version: 1.13.5
       react:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
+      react-router-dom:
+        specifier: 'catalog:'
+        version: 7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react-toastify:
-        specifier: ^11.0.5
+        specifier: 'catalog:'
         version: 11.0.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       zustand:
-        specifier: ^5.0.11
+        specifier: 'catalog:'
         version: 5.0.11(@types/react@19.2.14)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
     devDependencies:
       '@eslint/js':
-        specifier: ^9.39.1
+        specifier: 'catalog:'
         version: 9.39.2
       '@tailwindcss/vite':
-        specifier: ^4.1.18
+        specifier: 'catalog:'
         version: 4.1.18(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.0))
       '@types/node':
-        specifier: ^24.10.1
+        specifier: 'catalog:'
         version: 24.10.13
       '@types/react':
-        specifier: ^19.2.7
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
-        specifier: ^5.1.1
+        specifier: 'catalog:'
         version: 5.1.4(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.0))
       eslint:
-        specifier: ^9.39.1
+        specifier: 'catalog:'
         version: 9.39.2(jiti@2.6.1)
       eslint-plugin-react-hooks:
-        specifier: ^7.0.1
+        specifier: 'catalog:'
         version: 7.0.1(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-react-refresh:
-        specifier: ^0.4.24
+        specifier: 'catalog:'
         version: 0.4.26(eslint@9.39.2(jiti@2.6.1))
       globals:
-        specifier: ^16.5.0
+        specifier: 'catalog:'
         version: 16.5.0
       tailwindcss:
-        specifier: ^4.1.18
+        specifier: 'catalog:'
         version: 4.1.18
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.48.0
+        specifier: 'catalog:'
         version: 8.55.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       vite:
-        specifier: ^7.3.1
+        specifier: 'catalog:'
         version: 7.3.1(@types/node@24.10.13)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.0)
 
   apps/backend:
@@ -314,12 +398,27 @@ importers:
 
   packages/shared-ui:
     dependencies:
+      class-variance-authority:
+        specifier: 'catalog:'
+        version: 0.7.1
+      clsx:
+        specifier: 'catalog:'
+        version: 2.1.1
+      date-fns:
+        specifier: 'catalog:'
+        version: 4.1.0
       react:
-        specifier: ^19.0.0
+        specifier: 'catalog:'
         version: 19.2.4
+      react-day-picker:
+        specifier: 'catalog:'
+        version: 9.13.2(react@19.2.4)
       react-dom:
-        specifier: ^19.0.0
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
+      tailwind-merge:
+        specifier: 'catalog:'
+        version: 3.4.0
 
 packages:
 
@@ -548,6 +647,9 @@ packages:
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
+
+  '@date-fns/tz@1.4.1':
+    resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
 
   '@emnapi/core@1.8.1':
     resolution: {integrity: sha512-AvT9QFpxK0Zd8J0jopedNm+w/2fIzvtPKPjqyw9jwvBaReTTqPBk9Hixaz7KbjimP+QNz605/XnjFcDAL2pqBg==}
@@ -2695,6 +2797,12 @@ packages:
   dataloader@2.2.3:
     resolution: {integrity: sha512-y2krtASINtPFS1rSDjacrFgn1dcUuoREVabwlOGOe4SdxenREqwjwjElAdwvbGM7kgZz9a3KVicWR7vcz8rnzA==}
 
+  date-fns-jalali@4.1.0-0:
+    resolution: {integrity: sha512-hTIP/z+t+qKwBDcmmsnmjWTduxCg+5KfdqWQvb2X/8C9+knYY6epN/pfxdDuyVlSVeFz0sM5eEfwIUQ70U4ckg==}
+
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
+
   debug@4.3.4:
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
     engines: {node: '>=6.0'}
@@ -4236,6 +4344,12 @@ packages:
     resolution: {integrity: sha512-K5zQjDllxWkf7Z5xJdV0/B0WTNqx6vxG70zJE4N0kBs4LovmEYWJzQGxC9bS9RAKu3bgM40lrd5zoLJ12MQ5BA==}
     engines: {node: '>= 0.10'}
 
+  react-day-picker@9.13.2:
+    resolution: {integrity: sha512-IMPiXfXVIAuR5Yk58DDPBC8QKClrhdXV+Tr/alBrwrHUw0qDDYB1m5zPNuTnnPIr/gmJ4ChMxmtqPdxm8+R4Eg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      react: '>=16.8.0'
+
   react-docgen-typescript@2.4.0:
     resolution: {integrity: sha512-ZtAp5XTO5HRzQctjPU0ybY0RRCQO19X/8fxn3w7y2VVTUbGHDKULPTL4ky3vB05euSgG5NpALhEhDPvQ56wvXg==}
     peerDependencies:
@@ -5339,6 +5453,8 @@ snapshots:
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
+
+  '@date-fns/tz@1.4.1': {}
 
   '@emnapi/core@1.8.1':
     dependencies:
@@ -6735,7 +6851,7 @@ snapshots:
   '@types/jsonwebtoken@9.0.10':
     dependencies:
       '@types/ms': 2.1.0
-      '@types/node': 24.10.13
+      '@types/node': 22.19.11
 
   '@types/mdx@2.0.13': {}
 
@@ -7530,6 +7646,10 @@ snapshots:
   csstype@3.2.3: {}
 
   dataloader@2.2.3: {}
+
+  date-fns-jalali@4.1.0-0: {}
+
+  date-fns@4.1.0: {}
 
   debug@4.3.4:
     dependencies:
@@ -9233,6 +9353,13 @@ snapshots:
       http-errors: 2.0.1
       iconv-lite: 0.7.2
       unpipe: 1.0.0
+
+  react-day-picker@9.13.2(react@19.2.4):
+    dependencies:
+      '@date-fns/tz': 1.4.1
+      date-fns: 4.1.0
+      date-fns-jalali: 4.1.0-0
+      react: 19.2.4
 
   react-docgen-typescript@2.4.0(typescript@5.9.3):
     dependencies:

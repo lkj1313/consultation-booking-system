@@ -1,4 +1,4 @@
-import {
+﻿import {
   Body,
   Controller,
   Delete,
@@ -21,29 +21,26 @@ import { ScheduleService } from './schedule.service';
 
 @Controller('schedules')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
   @Post()
-  @Roles(UserRole.ADMIN)
   create(@Body() dto: CreateScheduleDto) {
     return this.scheduleService.create(dto);
   }
 
   @Get()
-  @Roles(UserRole.ADMIN, UserRole.COUNSELOR)
   findAll(@Query() query: FindSchedulesDto) {
     return this.scheduleService.findAll(query);
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN)
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateScheduleDto) {
     return this.scheduleService.update(id, dto);
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.scheduleService.remove(id);
   }
