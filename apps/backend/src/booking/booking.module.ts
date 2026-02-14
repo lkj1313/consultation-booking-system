@@ -7,7 +7,10 @@ import { BookingController } from './booking.controller';
 import { BookingService } from './booking.service';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([Booking, CounselorScheduleSlot]), AuthModule],
+  imports: [
+    MikroOrmModule.forFeature([Booking, CounselorScheduleSlot]),
+    AuthModule,
+  ],
   controllers: [BookingController],
   providers: [BookingService],
   exports: [BookingService],

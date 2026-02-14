@@ -1,24 +1,22 @@
-import { EntityManager, EntityRepository, LockMode } from '@mikro-orm/core';
-import { InjectEntityManager, InjectRepository } from '@mikro-orm/nestjs';
+import { EntityRepository, LockMode } from '@mikro-orm/core';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import {
   BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Booking, BookingStatus } from '../domain/entities/booking.entity';
+import { Booking, BookingStatus } from '@/domain/entities/booking.entity';
 import {
   CounselorScheduleSlot,
   CounselorScheduleSlotStatus,
-} from '../domain/entities/counselor-schedule-slot.entity';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { FindAvailableSlotsDto } from './dto/find-available-slots.dto';
+} from '@/domain/entities/counselor-schedule-slot.entity';
+import { CreateBookingDto } from '@/booking/dto/create-booking.dto';
+import { FindAvailableSlotsDto } from '@/booking/dto/find-available-slots.dto';
 
 @Injectable()
 export class BookingService {
   constructor(
-    @InjectEntityManager('default')
-    private readonly em: EntityManager,
     @InjectRepository(Booking)
     private readonly bookingRepository: EntityRepository<Booking>,
     @InjectRepository(CounselorScheduleSlot)
@@ -49,7 +47,8 @@ export class BookingService {
   }
 
   async create(dto: CreateBookingDto) {
-    const result = await this.em.transactional(async (trxEm) => {
+    const em = this.bookingRepository.getEntityManager();
+    const result = await em.transactional(async (trxEm) => {
       const slot = await trxEm.findOne(
         CounselorScheduleSlot,
         { id: dto.slotId },
@@ -101,7 +100,8 @@ export class BookingService {
   }
 
   async cancel(bookingId: number) {
-    const result = await this.em.transactional(async (trxEm) => {
+    const em = this.bookingRepository.getEntityManager();
+    const result = await em.transactional(async (trxEm) => {
       const booking = await trxEm.findOne(
         Booking,
         { id: bookingId },
@@ -148,7 +148,8 @@ export class BookingService {
   }
 
   async complete(bookingId: number) {
-    const result = await this.em.transactional(async (trxEm) => {
+    const em = this.bookingRepository.getEntityManager();
+    const result = await em.transactional(async (trxEm) => {
       const booking = await trxEm.findOne(
         Booking,
         { id: bookingId },
