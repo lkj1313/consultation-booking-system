@@ -5,4 +5,4 @@ export {
   getDefaultRange,
   toDateTimeLocal,
   toIso,
-} from '@consult/shared-lib';
+} from './date-time';

@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@consult/shared-lib": "workspace:*",
     "@consult/shared-ui": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "axios": "catalog:",

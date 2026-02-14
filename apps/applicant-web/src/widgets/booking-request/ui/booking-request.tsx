@@ -9,7 +9,8 @@ import {
   Input,
   Label,
 } from '@consult/shared-ui';
-import { useBookingRequest, formatDateTime } from '../model/use-booking-request';
+import { formatDateTime } from '@consult/shared-lib';
+import { useBookingRequest } from '../model/use-booking-request';
 
 export const BookingRequest = () => {
   const { filter, setFilter, form, setForm, slotsQuery, createBookingMutation, submitBooking } =

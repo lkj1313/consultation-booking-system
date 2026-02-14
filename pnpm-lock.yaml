@@ -95,6 +95,9 @@ importers:
 
   apps/admin-web:
     dependencies:
+      '@consult/shared-lib':
+        specifier: workspace:*
+        version: link:../../packages/shared-lib
       '@consult/shared-ui':
         specifier: workspace:*
         version: link:../../packages/shared-ui
@@ -204,6 +207,9 @@ importers:
 
   apps/applicant-web:
     dependencies:
+      '@consult/shared-lib':
+        specifier: workspace:*
+        version: link:../../packages/shared-lib
       '@consult/shared-ui':
         specifier: workspace:*
         version: link:../../packages/shared-ui
@@ -395,6 +401,8 @@ importers:
       typescript-eslint:
         specifier: ^8.20.0
         version: 8.55.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+
+  packages/shared-lib: {}
 
   packages/shared-ui:
     dependencies:
