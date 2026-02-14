@@ -99,4 +99,86 @@ export class BookingService {
       { populate: ['slot', 'slot.counselor'] },
     );
   }
+
+  async cancel(bookingId: number) {
+    const result = await this.em.transactional(async (trxEm) => {
+      const booking = await trxEm.findOne(
+        Booking,
+        { id: bookingId },
+        {
+          populate: ['slot'],
+          lockMode: LockMode.PESSIMISTIC_WRITE,
+        },
+      );
+
+      if (!booking) {
+        throw new NotFoundException('예약을 찾을 수 없습니다.');
+      }
+
+      const slot = await trxEm.findOne(
+        CounselorScheduleSlot,
+        { id: booking.slot.id },
+        { lockMode: LockMode.PESSIMISTIC_WRITE },
+      );
+
+      if (!slot) {
+        throw new NotFoundException('스케줄을 찾을 수 없습니다.');
+      }
+
+      if (booking.status === BookingStatus.CANCELLED) {
+        throw new BadRequestException('이미 취소된 예약입니다.');
+      }
+
+      if (booking.status === BookingStatus.COMPLETED) {
+        throw new BadRequestException('완료된 예약은 취소할 수 없습니다.');
+      }
+
+      booking.status = BookingStatus.CANCELLED;
+      slot.bookedCount = Math.max(0, slot.bookedCount - 1);
+
+      await trxEm.flush();
+
+      return booking.id;
+    });
+
+    return this.bookingRepository.findOneOrFail(
+      { id: result },
+      { populate: ['slot', 'slot.counselor'] },
+    );
+  }
+
+  async complete(bookingId: number) {
+    const result = await this.em.transactional(async (trxEm) => {
+      const booking = await trxEm.findOne(
+        Booking,
+        { id: bookingId },
+        {
+          populate: ['slot'],
+          lockMode: LockMode.PESSIMISTIC_WRITE,
+        },
+      );
+
+      if (!booking) {
+        throw new NotFoundException('예약을 찾을 수 없습니다.');
+      }
+
+      if (booking.status === BookingStatus.CANCELLED) {
+        throw new BadRequestException('취소된 예약은 완료 처리할 수 없습니다.');
+      }
+
+      if (booking.status === BookingStatus.COMPLETED) {
+        throw new BadRequestException('이미 완료된 예약입니다.');
+      }
+
+      booking.status = BookingStatus.COMPLETED;
+      await trxEm.flush();
+
+      return booking.id;
+    });
+
+    return this.bookingRepository.findOneOrFail(
+      { id: result },
+      { populate: ['slot', 'slot.counselor'] },
+    );
+  }
 }
