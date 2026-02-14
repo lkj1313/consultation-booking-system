@@ -15,6 +15,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../domain/entities/user.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { FindAvailableSlotsDto } from './dto/find-available-slots.dto';
+import { FindBookingsDto } from './dto/find-bookings.dto';
 import { BookingService } from './booking.service';
 
 @Controller('bookings')
@@ -24,6 +25,13 @@ export class BookingController {
   @Get('available-slots')
   findAvailableSlots(@Query() query: FindAvailableSlotsDto) {
     return this.bookingService.findAvailableSlots(query);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.COUNSELOR)
+  findBookings(@Query() query: FindBookingsDto) {
+    return this.bookingService.findBookings(query);
   }
 
   @Post()

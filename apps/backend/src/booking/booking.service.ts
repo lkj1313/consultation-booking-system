@@ -1,4 +1,4 @@
-import { EntityRepository, LockMode } from '@mikro-orm/core';
+﻿import { EntityRepository, LockMode } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import {
   BadRequestException,
@@ -6,13 +6,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { CreateBookingDto } from '@/booking/dto/create-booking.dto';
+import { FindAvailableSlotsDto } from '@/booking/dto/find-available-slots.dto';
+import { FindBookingsDto } from '@/booking/dto/find-bookings.dto';
 import { Booking, BookingStatus } from '@/domain/entities/booking.entity';
 import {
   CounselorScheduleSlot,
   CounselorScheduleSlotStatus,
 } from '@/domain/entities/counselor-schedule-slot.entity';
-import { CreateBookingDto } from '@/booking/dto/create-booking.dto';
-import { FindAvailableSlotsDto } from '@/booking/dto/find-available-slots.dto';
 
 @Injectable()
 export class BookingService {
@@ -46,15 +47,45 @@ export class BookingService {
     return slots.filter((slot) => slot.bookedCount < slot.capacity);
   }
 
+  async findBookings(query: FindBookingsDto) {
+    if (query.from && query.to && query.from >= query.to) {
+      throw new BadRequestException('조회 기간이 올바르지 않습니다.');
+    }
+
+    const startAtFilter =
+      query.from || query.to
+        ? {
+            ...(query.from ? { $gte: query.from } : {}),
+            ...(query.to ? { $lt: query.to } : {}),
+          }
+        : undefined;
+
+    return this.bookingRepository.find(
+      {
+        ...(query.status ? { status: query.status } : {}),
+        ...(query.counselorId || startAtFilter
+          ? {
+              slot: {
+                ...(query.counselorId ? { counselor: query.counselorId } : {}),
+                ...(startAtFilter ? { startAt: startAtFilter } : {}),
+              },
+            }
+          : {}),
+      },
+      {
+        populate: ['slot', 'slot.counselor'],
+        orderBy: { createdAt: 'desc' },
+      },
+    );
+  }
+
   async create(dto: CreateBookingDto) {
     const em = this.bookingRepository.getEntityManager();
     const result = await em.transactional(async (trxEm) => {
       const slot = await trxEm.findOne(
         CounselorScheduleSlot,
         { id: dto.slotId },
-        {
-          lockMode: LockMode.PESSIMISTIC_WRITE,
-        },
+        { lockMode: LockMode.PESSIMISTIC_WRITE },
       );
 
       if (!slot) {
@@ -86,7 +117,6 @@ export class BookingService {
       });
 
       slot.bookedCount += 1;
-
       trxEm.persist(booking);
       await trxEm.flush();
 
@@ -105,10 +135,7 @@ export class BookingService {
       const booking = await trxEm.findOne(
         Booking,
         { id: bookingId },
-        {
-          populate: ['slot'],
-          lockMode: LockMode.PESSIMISTIC_WRITE,
-        },
+        { populate: ['slot'], lockMode: LockMode.PESSIMISTIC_WRITE },
       );
 
       if (!booking) {
@@ -135,7 +162,6 @@ export class BookingService {
 
       booking.status = BookingStatus.CANCELLED;
       slot.bookedCount = Math.max(0, slot.bookedCount - 1);
-
       await trxEm.flush();
 
       return booking.id;
@@ -153,10 +179,7 @@ export class BookingService {
       const booking = await trxEm.findOne(
         Booking,
         { id: bookingId },
-        {
-          populate: ['slot'],
-          lockMode: LockMode.PESSIMISTIC_WRITE,
-        },
+        { populate: ['slot'], lockMode: LockMode.PESSIMISTIC_WRITE },
       );
 
       if (!booking) {
