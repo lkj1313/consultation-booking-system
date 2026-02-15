@@ -1,0 +1,27 @@
+﻿{
+  "name": "@consult/shared-ui",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./loading-spinner": "./src/loading-spinner.tsx",
+    "./button": "./src/button.tsx",
+    "./card": "./src/card.tsx",
+    "./app-shell": "./src/app-shell.tsx",
+    "./date-time-picker-30m": "./src/date-time-picker-30m.tsx",
+    "./input": "./src/input.tsx",
+    "./label": "./src/label.tsx"
+  },
+  "dependencies": {
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
+    "date-fns": "catalog:",
+    "react-day-picker": "catalog:",
+    "tailwind-merge": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
+}

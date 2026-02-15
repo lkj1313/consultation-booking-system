@@ -7,7 +7,7 @@ build/
 coverage/
 .vite/
 *.tsbuildinfo
-
+node_modules/
 # env
 .env
 .env.*
@@ -22,3 +22,10 @@ pnpm-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+Microsoft/
+.turbo/
+.pnpm-store/
+
+# local docs
+docs/HANDOFF.md
+docs/ORIGINAL_REQUIREMENTS.md

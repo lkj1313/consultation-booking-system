@@ -32,4 +32,11 @@ export default tseslint.config(
       "prettier/prettier": ["error", { endOfLine: "auto" }],
     },
   },
+  // class-validator 데코레이터(@IsEmail() 등) 호출 시 타입 미해결로 인한 no-unsafe-call 경고 완화
+  {
+    files: ['**/dto/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-unsafe-call': 'off',
+    },
+  },
 );

@@ -4,7 +4,10 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { BookingModule } from './booking/booking.module';
 import { buildMikroOrmConfig } from './config/mikro-orm.config';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
   imports: [
@@ -18,6 +21,9 @@ import { buildMikroOrmConfig } from './config/mikro-orm.config';
       useFactory: (configService: ConfigService) =>
         buildMikroOrmConfig(configService),
     }),
+    AuthModule,
+    BookingModule,
+    ScheduleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
