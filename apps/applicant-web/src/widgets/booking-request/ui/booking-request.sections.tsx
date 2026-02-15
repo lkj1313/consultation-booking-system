@@ -1,7 +1,6 @@
 import {
   WEEKDAY_LABELS_KO,
-  buildMonthCells,
-  formatDateTime,
+  formatDateTimeNoYear,
   formatMonthTitle,
   isPastDate,
   toDateKey,
@@ -9,15 +8,30 @@ import {
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@consult/shared-ui";
 import type { AvailableSlot } from "@/entities/slot";
 
-export { buildMonthCells, isPastDate, toDateKey };
-
 interface BookingLinkNoticeCardProps {
   hasToken: boolean;
+  linkErrorMessage?: string | null;
+  isAlreadyBookedLink?: boolean;
 }
 
-export const BookingLinkNoticeCard = ({ hasToken }: BookingLinkNoticeCardProps) => {
+export const BookingLinkNoticeCard = ({
+  hasToken,
+  linkErrorMessage,
+  isAlreadyBookedLink = false,
+}: BookingLinkNoticeCardProps) => {
   if (hasToken) {
-    return null;
+    if (!linkErrorMessage) {
+      return null;
+    }
+
+    return (
+      <Card className={isAlreadyBookedLink ? "border-cyan-300 bg-cyan-50/40" : "border-rose-200"}>
+        <CardHeader>
+          <CardTitle>{isAlreadyBookedLink ? "이미 예약이 완료된 링크입니다." : "예약 링크를 확인해주세요."}</CardTitle>
+          <CardDescription>{linkErrorMessage}</CardDescription>
+        </CardHeader>
+      </Card>
+    );
   }
 
   return (
@@ -37,6 +51,7 @@ interface BookingCalendarCardProps {
   selectedDateKey: string;
   availableCountByDate: Map<string, number>;
   todayStart: Date;
+  interactionDisabled: boolean;
   onSelectDate: (dateKey: string) => void;
 }
 
@@ -47,6 +62,7 @@ export const BookingCalendarCard = ({
   selectedDateKey,
   availableCountByDate,
   todayStart,
+  interactionDisabled,
   onSelectDate,
 }: BookingCalendarCardProps) => {
   return (
@@ -57,11 +73,23 @@ export const BookingCalendarCard = ({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
-          <Button type="button" variant="outline" className="h-9 px-3" onClick={() => onMoveMonth(-1)}>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-9 px-3"
+            disabled={interactionDisabled}
+            onClick={() => onMoveMonth(-1)}
+          >
             이전 달
           </Button>
           <p className="text-base font-semibold text-slate-900">{formatMonthTitle(viewMonth)}</p>
-          <Button type="button" variant="outline" className="h-9 px-3" onClick={() => onMoveMonth(1)}>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-9 px-3"
+            disabled={interactionDisabled}
+            onClick={() => onMoveMonth(1)}
+          >
             다음 달
           </Button>
         </div>
@@ -81,7 +109,7 @@ export const BookingCalendarCard = ({
             const key = toDateKey(cell);
             const availableCount = availableCountByDate.get(key) ?? 0;
             const isSelected = selectedDateKey === key;
-            const disabled = isPastDate(cell, todayStart) || availableCount === 0;
+            const disabled = interactionDisabled || isPastDate(cell, todayStart) || availableCount === 0;
 
             return (
               <button
@@ -119,6 +147,7 @@ export const BookingCalendarCard = ({
 interface BookingTimeCardProps {
   isLoading: boolean;
   isError: boolean;
+  errorMessage?: string | null;
   slots: AvailableSlot[];
   selectedSlotId: number;
   onSelectSlot: (slotId: number) => void;
@@ -127,6 +156,7 @@ interface BookingTimeCardProps {
 export const BookingTimeCard = ({
   isLoading,
   isError,
+  errorMessage,
   slots,
   selectedSlotId,
   onSelectSlot,
@@ -138,7 +168,9 @@ export const BookingTimeCard = ({
       </CardHeader>
       <CardContent className="space-y-2">
         {isLoading && <p className="text-sm text-slate-500">달력 정보를 불러오는 중...</p>}
-        {isError && <p className="text-sm text-rose-600">시간 정보를 불러오지 못했습니다. 다시 시도해 주세요.</p>}
+        {isError && (
+          <p className="text-sm text-rose-600">{errorMessage ?? "시간 정보를 불러오지 못했습니다. 다시 시도해 주세요."}</p>
+        )}
         {!isLoading && !isError && slots.length === 0 && (
           <p className="text-sm text-slate-600">선택한 날짜에는 예약 가능한 시간이 없습니다.</p>
         )}
@@ -156,8 +188,8 @@ export const BookingTimeCard = ({
                     : "border-slate-200 bg-white hover:border-slate-300"
                 }`}
               >
-                <p className="text-sm font-semibold text-slate-900">{formatDateTime(slot.startAt)}</p>
-                <p className="mt-1 text-xs text-slate-600">종료 {formatDateTime(slot.endAt)}</p>
+                <p className="text-sm font-semibold text-slate-900">{formatDateTimeNoYear(slot.startAt)}</p>
+                <p className="mt-1 text-xs text-slate-600">종료 {formatDateTimeNoYear(slot.endAt)}</p>
               </button>
             );
           })}
@@ -170,30 +202,47 @@ export const BookingTimeCard = ({
 interface BookingConfirmCardProps {
   selectedSlot: AvailableSlot | null;
   isPending: boolean;
+  isBooked: boolean;
+  isAlreadyBookedLink: boolean;
   canSubmit: boolean;
   onSubmit: () => void;
 }
 
-export const BookingConfirmCard = ({ selectedSlot, isPending, canSubmit, onSubmit }: BookingConfirmCardProps) => {
+export const BookingConfirmCard = ({
+  selectedSlot,
+  isPending,
+  isBooked,
+  isAlreadyBookedLink,
+  canSubmit,
+  onSubmit,
+}: BookingConfirmCardProps) => {
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-xl">3. 예약 확정</CardTitle>
-        <CardDescription>신청자 정보는 예약 링크 이메일로 자동 처리됩니다.</CardDescription>
+        <CardDescription>
+          {isBooked || isAlreadyBookedLink
+            ? "예약이 완료되어 더 이상 날짜/시간을 변경할 수 없습니다."
+            : "신청자 정보는 예약 링크 이메일로 자동 처리됩니다."}
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {selectedSlot ? (
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm">
             <p className="font-semibold text-slate-900">선택한 시간</p>
-            <p className="mt-1 text-slate-700">{formatDateTime(selectedSlot.startAt)}</p>
-            <p className="text-slate-600">종료 {formatDateTime(selectedSlot.endAt)}</p>
+            <p className="mt-1 text-slate-700">{formatDateTimeNoYear(selectedSlot.startAt)}</p>
+            <p className="text-slate-600">종료 {formatDateTimeNoYear(selectedSlot.endAt)}</p>
           </div>
         ) : (
           <p className="text-sm text-slate-600">달력에서 날짜를 선택한 뒤 시간을 고르세요.</p>
         )}
 
-        <Button className="w-full" disabled={!canSubmit || isPending} onClick={onSubmit}>
-          {isPending ? "예약 처리 중..." : "예약 확정"}
+        <Button
+          className="w-full"
+          disabled={isBooked || isAlreadyBookedLink || !canSubmit || isPending}
+          onClick={onSubmit}
+        >
+          {isBooked || isAlreadyBookedLink ? "예약 완료" : isPending ? "예약 처리 중..." : "예약 확정"}
         </Button>
       </CardContent>
     </Card>

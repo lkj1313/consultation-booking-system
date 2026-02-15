@@ -2,6 +2,7 @@ export {
   addMinutes,
   floorToThirtyMinutes,
   formatDateTime,
+  formatDateTimeNoYear,
   getDefaultRange,
   toDateTimeLocal,
   toIso,

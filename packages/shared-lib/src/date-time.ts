@@ -34,3 +34,12 @@ export const getDefaultRange = () => {
 
 export const formatDateTime = (iso: string) =>
   new Date(iso).toLocaleString('ko-KR', { hour12: false });
+
+export const formatDateTimeNoYear = (iso: string) =>
+  new Date(iso).toLocaleString('ko-KR', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });

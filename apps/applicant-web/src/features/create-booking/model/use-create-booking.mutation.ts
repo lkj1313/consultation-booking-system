@@ -12,7 +12,6 @@ export const useCreateBookingMutation = () => {
       await http.post("/bookings", payload);
     },
     onSuccess: async () => {
-      toast.success("예약이 완료되었습니다.");
       await queryClient.invalidateQueries({ queryKey: ["available-slots"] });
     },
     onError: (error) => {
