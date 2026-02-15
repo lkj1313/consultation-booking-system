@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
   DateTimePicker30m,
-  Input,
 } from '@/shared/ui';
 import { formatDateTime } from '@/shared/lib/date-time';
 import { useBookingSection } from '../model/use-booking-section';
@@ -17,6 +16,7 @@ interface BookingSectionProps {
 }
 
 export const BookingSection = ({ isAdmin, userId }: BookingSectionProps) => {
+  void isAdmin;
   const {
     bookingFilter,
     setBookingFilter,
@@ -31,7 +31,7 @@ export const BookingSection = ({ isAdmin, userId }: BookingSectionProps) => {
         <CardTitle className="text-lg">예약 목록</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-3 md:grid-cols-5">
+        <div className="grid gap-3 md:grid-cols-4">
           <DateTimePicker30m
             value={bookingFilter.from}
             onChange={(next) => setBookingFilter((prev) => ({ ...prev, from: next }))}
@@ -39,18 +39,6 @@ export const BookingSection = ({ isAdmin, userId }: BookingSectionProps) => {
           <DateTimePicker30m
             value={bookingFilter.to}
             onChange={(next) => setBookingFilter((prev) => ({ ...prev, to: next }))}
-          />
-          <Input
-            type="number"
-            min={1}
-            disabled={!isAdmin}
-            value={bookingFilter.counselorId}
-            onChange={(e) =>
-              setBookingFilter((prev) => ({
-                ...prev,
-                counselorId: Number(e.target.value),
-              }))
-            }
           />
           <select
             className="h-11 rounded-lg border border-slate-300 bg-white px-4 text-sm"

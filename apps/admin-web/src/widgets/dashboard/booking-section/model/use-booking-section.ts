@@ -11,19 +11,19 @@ interface UseBookingSectionParams {
 }
 
 export const useBookingSection = ({ isAdmin, userId }: UseBookingSectionParams) => {
+  void isAdmin;
+  void userId;
   const initialRange = useMemo(() => getDefaultRange(), []);
 
   const [bookingFilter, setBookingFilter] = useState({
     from: initialRange.from,
     to: initialRange.to,
-    counselorId: userId ?? 1,
     status: '' as '' | BookingStatus,
   });
 
   const queryPayload: BookingQuery = {
     from: toIso(bookingFilter.from),
     to: toIso(bookingFilter.to),
-    ...(isAdmin ? { counselorId: Number(bookingFilter.counselorId) } : {}),
     ...(bookingFilter.status ? { status: bookingFilter.status } : {}),
   };
 

@@ -1,4 +1,4 @@
-﻿import {
+import {
   Button,
   Card,
   CardContent,
@@ -17,6 +17,8 @@ interface ScheduleSectionProps {
 }
 
 export const ScheduleSection = ({ isAdmin, userId }: ScheduleSectionProps) => {
+  void userId;
+
   const {
     scheduleFilter,
     setScheduleFilter,
@@ -27,10 +29,7 @@ export const ScheduleSection = ({ isAdmin, userId }: ScheduleSectionProps) => {
     createScheduleMutation,
     updateScheduleStatusMutation,
     deleteScheduleMutation,
-  } = useScheduleSection({ isAdmin, userId });
-
-  const selectedCounselorId = Number(scheduleFilter.counselorId);
-  const canCreate = Number.isInteger(selectedCounselorId) && selectedCounselorId > 0;
+  } = useScheduleSection();
 
   return (
     <>
@@ -56,21 +55,16 @@ export const ScheduleSection = ({ isAdmin, userId }: ScheduleSectionProps) => {
                 min={1}
                 max={3}
                 value={createForm.capacity}
-                onChange={(e) =>
-                  setCreateForm((prev) => ({ ...prev, capacity: Number(e.target.value) }))
+                onChange={(event) =>
+                  setCreateForm((prev) => ({ ...prev, capacity: Number(event.target.value) }))
                 }
               />
             </div>
             <div className="flex items-end">
               <Button
                 className="w-full"
-                disabled={createScheduleMutation.isPending || !canCreate}
-                onClick={() =>
-                  createScheduleMutation.mutate({
-                    ...createForm,
-                    counselorId: selectedCounselorId,
-                  })
-                }
+                disabled={createScheduleMutation.isPending}
+                onClick={() => createScheduleMutation.mutate(createForm)}
               >
                 생성
               </Button>
@@ -84,7 +78,7 @@ export const ScheduleSection = ({ isAdmin, userId }: ScheduleSectionProps) => {
           <CardTitle className="text-lg">스케줄 목록</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-3 md:grid-cols-4">
+          <div className="grid gap-3 md:grid-cols-3">
             <DateTimePicker30m
               value={scheduleFilter.from}
               onChange={(next) => setScheduleFilter((prev) => ({ ...prev, from: next }))}
@@ -92,18 +86,6 @@ export const ScheduleSection = ({ isAdmin, userId }: ScheduleSectionProps) => {
             <DateTimePicker30m
               value={scheduleFilter.to}
               onChange={(next) => setScheduleFilter((prev) => ({ ...prev, to: next }))}
-            />
-            <Input
-              type="number"
-              min={1}
-              disabled={!isAdmin}
-              value={scheduleFilter.counselorId}
-              onChange={(e) =>
-                setScheduleFilter((prev) => ({
-                  ...prev,
-                  counselorId: Number(e.target.value),
-                }))
-              }
             />
             <Button onClick={() => schedulesQuery.refetch()} variant="outline">
               조회 새로고침

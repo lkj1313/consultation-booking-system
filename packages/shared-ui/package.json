@@ -8,6 +8,7 @@
     "./loading-spinner": "./src/loading-spinner.tsx",
     "./button": "./src/button.tsx",
     "./card": "./src/card.tsx",
+    "./app-shell": "./src/app-shell.tsx",
     "./date-time-picker-30m": "./src/date-time-picker-30m.tsx",
     "./input": "./src/input.tsx",
     "./label": "./src/label.tsx"

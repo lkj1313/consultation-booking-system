@@ -8,16 +8,21 @@
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import type { AuthUser } from '../auth/types/auth-user.interface';
 import { UserRole } from '../domain/entities/user.entity';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { FindSchedulesDto } from './dto/find-schedules.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { ScheduleService } from './schedule.service';
+
+type RequestWithUser = Request & { user?: AuthUser };
 
 @Controller('schedules')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -26,8 +31,8 @@ export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
   @Post()
-  create(@Body() dto: CreateScheduleDto) {
-    return this.scheduleService.create(dto);
+  create(@Req() request: RequestWithUser, @Body() dto: CreateScheduleDto) {
+    return this.scheduleService.create(request.user!.userId, dto);
   }
 
   @Get()

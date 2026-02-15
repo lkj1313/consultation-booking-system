@@ -1,4 +1,5 @@
-﻿import {
+import type { RegisterRequest } from '@consult/shared-types';
+import {
   IsEmail,
   IsNotEmpty,
   IsString,
@@ -7,21 +8,21 @@
   MinLength,
 } from 'class-validator';
 
-export class CreateAuthDto {
-  @IsEmail({}, { message: 'email must be a valid email address' })
-  @IsNotEmpty({ message: 'email is required' })
+export class CreateAuthDto implements RegisterRequest {
+  @IsEmail({}, { message: '올바른 이메일 형식이어야 합니다.' })
+  @IsNotEmpty({ message: '이메일은 필수입니다.' })
   email: string;
 
-  @IsString({ message: 'password must be a string' })
-  @MinLength(8, { message: 'password must be at least 8 characters long' })
-  @MaxLength(72, { message: 'password must be at most 72 characters long' })
+  @IsString({ message: '비밀번호는 문자열이어야 합니다.' })
+  @MinLength(8, { message: '비밀번호는 최소 8자 이상이어야 합니다.' })
+  @MaxLength(72, { message: '비밀번호는 최대 72자까지 입력할 수 있습니다.' })
   @Matches(/^(?=.*[^A-Za-z0-9\s]).+$/, {
-    message: 'password must include at least one special character',
+    message: '비밀번호에는 특수문자가 최소 1개 포함되어야 합니다.',
   })
   password: string;
 
-  @IsString({ message: 'name must be a string' })
-  @MinLength(2, { message: 'name must be at least 2 characters long' })
-  @MaxLength(50, { message: 'name must be at most 50 characters long' })
+  @IsString({ message: '이름은 문자열이어야 합니다.' })
+  @MinLength(2, { message: '이름은 최소 2자 이상이어야 합니다.' })
+  @MaxLength(50, { message: '이름은 최대 50자까지 입력할 수 있습니다.' })
   name: string;
 }

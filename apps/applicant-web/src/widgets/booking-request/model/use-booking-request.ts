@@ -1,29 +1,23 @@
-import { useMemo, useState } from 'react';
-import { getDefaultRange, toIso } from '@consult/shared-lib';
-import { useAvailableSlotsQuery } from '@/entities/slot';
-import { useCreateBookingMutation } from '@/features/create-booking';
+import { useMemo, useState } from "react";
+import { startOfMonth, startOfNextMonth, toDateKey } from "@consult/shared-lib";
+import { useAvailableSlotsQuery } from "@/entities/slot";
+import { useCreateBookingMutation } from "@/features/create-booking";
 
-export const useBookingRequest = () => {
-  const initialRange = useMemo(() => getDefaultRange(), []);
-
-  const [filter, setFilter] = useState({
-    from: initialRange.from,
-    to: initialRange.to,
-    counselorId: 1,
-  });
-
+export const useBookingRequest = (token: string | null) => {
+  const [viewMonth, setViewMonth] = useState(() => startOfMonth(new Date()));
+  const [selectedDateKey, setSelectedDateKey] = useState(() => toDateKey(new Date()));
   const [form, setForm] = useState({
     slotId: 0,
-    applicantName: '',
-    applicantEmail: '',
-    applicantPhone: '',
   });
 
-  const queryPayload = {
-    from: toIso(filter.from),
-    to: toIso(filter.to),
-    counselorId: Number(filter.counselorId),
-  };
+  const queryPayload = useMemo(
+    () => ({
+      token: token ?? "",
+      from: startOfMonth(viewMonth).toISOString(),
+      to: startOfNextMonth(viewMonth).toISOString(),
+    }),
+    [token, viewMonth],
+  );
 
   const slotsQuery = useAvailableSlotsQuery(queryPayload);
   const createBookingMutation = useCreateBookingMutation();
@@ -34,16 +28,16 @@ export const useBookingRequest = () => {
     }
 
     createBookingMutation.mutate({
+      token: token ?? "",
       slotId: Number(form.slotId),
-      applicantName: form.applicantName.trim(),
-      applicantEmail: form.applicantEmail.trim(),
-      applicantPhone: form.applicantPhone.trim() || undefined,
     });
   };
 
   return {
-    filter,
-    setFilter,
+    viewMonth,
+    setViewMonth,
+    selectedDateKey,
+    setSelectedDateKey,
     form,
     setForm,
     slotsQuery,

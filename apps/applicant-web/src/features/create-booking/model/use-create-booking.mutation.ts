@@ -1,27 +1,22 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
-import { http } from '@/shared/api';
-
-interface CreateBookingPayload {
-  slotId: number;
-  applicantName: string;
-  applicantEmail: string;
-  applicantPhone?: string;
-}
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { CreateBookingRequest } from "@consult/shared-types";
+import { toast } from "sonner";
+import { http } from "@/shared/api";
+import { getApiErrorMessage } from "@/shared/lib/get-api-error-message";
 
 export const useCreateBookingMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: CreateBookingPayload) => {
-      await http.post('/bookings', payload);
+    mutationFn: async (payload: CreateBookingRequest) => {
+      await http.post("/bookings", payload);
     },
     onSuccess: async () => {
-      toast.success('예약이 완료되었습니다.');
-      await queryClient.invalidateQueries({ queryKey: ['available-slots'] });
+      toast.success("예약이 완료되었습니다.");
+      await queryClient.invalidateQueries({ queryKey: ["available-slots"] });
     },
-    onError: () => {
-      toast.error('예약에 실패했습니다. 입력값을 확인해 주세요.');
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "예약 요청에 실패했습니다."));
     },
   });
 };

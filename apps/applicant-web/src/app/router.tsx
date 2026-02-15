@@ -11,8 +11,12 @@ export const router = createBrowserRouter([
     element: <PublicLayout />,
     children: [
       {
-        path: '/booking',
+        path: '/reserve',
         element: <BookingPage />,
+      },
+      {
+        path: '/booking',
+        element: <RootRedirect />,
       },
     ],
   },

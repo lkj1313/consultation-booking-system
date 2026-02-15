@@ -1,24 +1,14 @@
-﻿import axios, {
-  AxiosError,
-  type InternalAxiosRequestConfig,
-} from 'axios';
-import { decodeAccessToken } from '@/shared/lib/decode-access-token';
-import {
-  clearAccessToken,
-  getAccessToken,
-  setAccessToken,
-} from '@/shared/lib/auth-token';
+import type { AuthTokenResponse } from '@consult/shared-types';
+import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { useSessionStore } from '@/entities/user';
+import { clearAccessToken, getAccessToken, setAccessToken } from '@/shared/lib/auth-token';
+import { decodeAccessToken } from '@/shared/lib/decode-access-token';
 
 type RetryableConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
 
-type RefreshResponse = {
-  accessToken: string;
-  tokenType: 'Bearer';
-  expiresIn: number;
-};
+type RefreshResponse = AuthTokenResponse;
 
 const baseURL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 

@@ -12,7 +12,7 @@ import { User } from './user.entity';
 
 @Entity({ tableName: 'booking_link_tokens' })
 @Unique({ properties: ['tokenHash'] })
-@Index({ properties: ['targetEmail', 'expiresAt'] })
+@Index({ properties: ['targetName', 'targetEmail', 'expiresAt'] })
 @Index({ properties: ['counselor', 'createdAt'] })
 @Check<BookingLinkToken>({
   expression: (columns) => `${columns.expiresAt} > ${columns.createdAt}`,
@@ -31,6 +31,9 @@ export class BookingLinkToken {
 
   @Property({ length: 255 })
   targetEmail!: string;
+
+  @Property({ length: 100 })
+  targetName!: string;
 
   @Property({ type: 'timestamptz' })
   expiresAt!: Date;

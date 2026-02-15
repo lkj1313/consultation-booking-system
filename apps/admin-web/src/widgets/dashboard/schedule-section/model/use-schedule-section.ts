@@ -6,18 +6,12 @@ import { useSchedulesQuery } from '@/entities/schedule';
 import type { ScheduleQuery } from '@/entities/schedule';
 import { addMinutes, floorToThirtyMinutes, getDefaultRange, toDateTimeLocal, toIso } from '@/shared/lib/date-time';
 
-interface UseScheduleSectionParams {
-  isAdmin: boolean;
-  userId: number | null;
-}
-
-export const useScheduleSection = ({ isAdmin, userId }: UseScheduleSectionParams) => {
+export const useScheduleSection = () => {
   const initialRange = useMemo(() => getDefaultRange(), []);
 
   const [scheduleFilter, setScheduleFilter] = useState({
     from: initialRange.from,
     to: initialRange.to,
-    counselorId: userId ?? 1,
   });
 
   const [createForm, setCreateForm] = useState({
@@ -47,7 +41,6 @@ export const useScheduleSection = ({ isAdmin, userId }: UseScheduleSectionParams
   const queryPayload: ScheduleQuery = {
     from: toIso(scheduleFilter.from),
     to: toIso(scheduleFilter.to),
-    ...(isAdmin ? { counselorId: Number(scheduleFilter.counselorId) } : {}),
   };
 
   const schedulesQuery = useSchedulesQuery(queryPayload);
@@ -56,7 +49,6 @@ export const useScheduleSection = ({ isAdmin, userId }: UseScheduleSectionParams
   const deleteScheduleMutation = useDeleteScheduleMutation();
 
   return {
-    isAdmin,
     scheduleFilter,
     setScheduleFilter,
     createForm,

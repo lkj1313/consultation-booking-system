@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { http } from '@/shared/api';
-import type { SlotStatus } from '@/entities/schedule';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import type { SlotStatus } from "@/entities/schedule";
+import { http } from "@/shared/api";
+import { getApiErrorMessage } from "@/shared/lib/get-api-error-message";
 
 interface UpdateScheduleStatusPayload {
   id: number;
@@ -16,11 +17,12 @@ export const useUpdateScheduleStatusMutation = () => {
       await http.patch(`/schedules/${id}`, { status });
     },
     onSuccess: async () => {
-      toast.success('스케줄 상태를 변경했습니다.');
-      await queryClient.invalidateQueries({ queryKey: ['schedules'] });
+      toast.success("스케줄 상태가 변경되었습니다.");
+      await queryClient.invalidateQueries({ queryKey: ["schedules"] });
     },
-    onError: () => {
-      toast.error('스케줄 상태 변경에 실패했습니다.');
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "스케줄 상태 변경에 실패했습니다."));
     },
   });
 };
+

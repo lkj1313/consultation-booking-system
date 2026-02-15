@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { PropsWithChildren } from 'react';
-import { ToastContainer } from 'react-toastify';
+import { Toaster } from 'sonner';
 
 export const AppProviders = ({ children }: PropsWithChildren) => {
   const [queryClient] = useState(() => new QueryClient());
@@ -9,7 +9,7 @@ export const AppProviders = ({ children }: PropsWithChildren) => {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <ToastContainer position="top-right" autoClose={2500} />
+      <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
 };

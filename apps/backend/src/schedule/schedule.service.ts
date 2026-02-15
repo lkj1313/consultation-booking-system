@@ -19,10 +19,10 @@ export class ScheduleService {
     private readonly userRepository: EntityRepository<User>,
   ) {}
 
-  async create(dto: CreateScheduleDto) {
+  async create(counselorId: number, dto: CreateScheduleDto) {
     this.validateTimeSlot(dto.startAt, dto.endAt);
 
-    const counselor = await this.userRepository.findOne({ id: dto.counselorId });
+    const counselor = await this.userRepository.findOne({ id: counselorId });
     if (!counselor) {
       throw new NotFoundException('상담사를 찾을 수 없습니다.');
     }
@@ -83,14 +83,6 @@ export class ScheduleService {
 
     if (dto.capacity !== undefined && dto.capacity < slot.bookedCount) {
       throw new BadRequestException('현재 예약 수보다 적은 정원으로 수정할 수 없습니다.');
-    }
-
-    if (dto.counselorId !== undefined && dto.counselorId !== slot.counselor.id) {
-      const counselor = await this.userRepository.findOne({ id: dto.counselorId });
-      if (!counselor) {
-        throw new NotFoundException('상담사를 찾을 수 없습니다.');
-      }
-      slot.counselor = counselor;
     }
 
     slot.startAt = nextStartAt;

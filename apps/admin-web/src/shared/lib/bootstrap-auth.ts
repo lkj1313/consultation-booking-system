@@ -1,13 +1,10 @@
-﻿import axios from 'axios';
+import type { AuthTokenResponse } from '@consult/shared-types';
+import axios from 'axios';
 import { useSessionStore } from '@/entities/user';
 import { clearAccessToken, setAccessToken } from './auth-token';
 import { decodeAccessToken } from './decode-access-token';
 
-interface RefreshResponse {
-  accessToken: string;
-  tokenType: 'Bearer';
-  expiresIn: number;
-}
+type RefreshResponse = AuthTokenResponse;
 
 export const bootstrapAuth = async (): Promise<boolean> => {
   const baseURL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
@@ -35,3 +32,4 @@ export const bootstrapAuth = async (): Promise<boolean> => {
     return false;
   }
 };
+
