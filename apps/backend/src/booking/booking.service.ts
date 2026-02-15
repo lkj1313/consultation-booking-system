@@ -1,7 +1,13 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { EntityRepository, LockMode } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import nodemailer from 'nodemailer';
 import { CreateBookingLinkDto } from '@/booking/dto/create-booking-link.dto';
@@ -10,7 +16,10 @@ import { FindAvailableSlotsDto } from '@/booking/dto/find-available-slots.dto';
 import { FindBookingsDto } from '@/booking/dto/find-bookings.dto';
 import { Booking, BookingStatus } from '@/domain/entities/booking.entity';
 import { BookingLinkToken } from '@/domain/entities/booking-link-token.entity';
-import { CounselorScheduleSlot, CounselorScheduleSlotStatus } from '@/domain/entities/counselor-schedule-slot.entity';
+import {
+  CounselorScheduleSlot,
+  CounselorScheduleSlotStatus,
+} from '@/domain/entities/counselor-schedule-slot.entity';
 import { User } from '@/domain/entities/user.entity';
 
 @Injectable()
@@ -35,12 +44,20 @@ export class BookingService {
 
     const plainToken = this.createPlainToken();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const normalizedTargetEmail = this.toTrimmedString(
+      dto.targetEmail,
+    ).toLowerCase();
+    const normalizedTargetName = this.toTrimmedString(dto.targetName);
+
+    if (!normalizedTargetEmail || !normalizedTargetName) {
+      throw new BadRequestException('예약 링크 대상 정보가 올바르지 않습니다.');
+    }
 
     const bookingLinkToken = this.bookingLinkTokenRepository.create({
       counselor,
       tokenHash: this.hashToken(plainToken),
-      targetEmail: dto.targetEmail.trim().toLowerCase(),
-      targetName: dto.targetName.trim(),
+      targetEmail: normalizedTargetEmail,
+      targetName: normalizedTargetName,
       expiresAt,
     });
 
@@ -48,16 +65,16 @@ export class BookingService {
     em.persist(bookingLinkToken);
     await em.flush();
 
-    const reservationUrl = this.buildReservationUrl(plainToken);
+    const reservationUrl: string = this.buildReservationUrl(plainToken);
 
     return {
-      targetName: bookingLinkToken.targetName,
-      targetEmail: bookingLinkToken.targetEmail,
+      targetName: normalizedTargetName,
+      targetEmail: normalizedTargetEmail,
       expiresAt,
       reservationUrl,
       message: await this.sendBookingLinkEmail({
-        targetName: bookingLinkToken.targetName,
-        targetEmail: bookingLinkToken.targetEmail,
+        targetName: normalizedTargetName,
+        targetEmail: normalizedTargetEmail,
         reservationUrl,
         expiresAt,
       }),
@@ -115,7 +132,12 @@ export class BookingService {
           : {}),
       },
       {
-        populate: ['slot', 'slot.counselor'],
+        populate: [
+          'slot',
+          'slot.counselor',
+          'consultationNote',
+          'consultationNote.counselor',
+        ],
         orderBy: { createdAt: 'desc' },
       },
     );
@@ -133,7 +155,9 @@ export class BookingService {
       );
       this.ensureBookingLinkUsable(bookingLinkToken);
 
-      const normalizedApplicantEmail = bookingLinkToken.targetEmail.trim().toLowerCase();
+      const normalizedApplicantEmail = bookingLinkToken.targetEmail
+        .trim()
+        .toLowerCase();
 
       const slot = await trxEm.findOne(
         CounselorScheduleSlot,
@@ -146,7 +170,9 @@ export class BookingService {
       }
 
       if (slot.counselor.id !== bookingLinkToken.counselor.id) {
-        throw new BadRequestException('해당 링크로 예약할 수 없는 스케줄입니다.');
+        throw new BadRequestException(
+          '해당 링크로 예약할 수 없는 스케줄입니다.',
+        );
       }
 
       if (slot.status !== CounselorScheduleSlotStatus.OPEN) {
@@ -165,9 +191,16 @@ export class BookingService {
         throw new ConflictException('동일한 시간대에 이미 예약이 존재합니다.');
       }
 
+      const applicantNameFromLink = this.toTrimmedString(
+        bookingLinkToken.targetName,
+      );
+
       const booking = trxEm.create(Booking, {
         slot,
-        applicantName: bookingLinkToken.targetName.trim() || this.deriveApplicantNameFromEmail(normalizedApplicantEmail),
+        applicantName:
+          applicantNameFromLink.length > 0
+            ? applicantNameFromLink
+            : this.deriveApplicantNameFromEmail(normalizedApplicantEmail),
         applicantEmail: normalizedApplicantEmail,
         applicantPhone: dto.applicantPhone?.trim() || null,
         status: BookingStatus.RESERVED,
@@ -183,7 +216,14 @@ export class BookingService {
 
     return this.bookingRepository.findOneOrFail(
       { id: result.id },
-      { populate: ['slot', 'slot.counselor'] },
+      {
+        populate: [
+          'slot',
+          'slot.counselor',
+          'consultationNote',
+          'consultationNote.counselor',
+        ],
+      },
     );
   }
 
@@ -227,7 +267,14 @@ export class BookingService {
 
     return this.bookingRepository.findOneOrFail(
       { id: result },
-      { populate: ['slot', 'slot.counselor'] },
+      {
+        populate: [
+          'slot',
+          'slot.counselor',
+          'consultationNote',
+          'consultationNote.counselor',
+        ],
+      },
     );
   }
 
@@ -260,7 +307,14 @@ export class BookingService {
 
     return this.bookingRepository.findOneOrFail(
       { id: result },
-      { populate: ['slot', 'slot.counselor'] },
+      {
+        populate: [
+          'slot',
+          'slot.counselor',
+          'consultationNote',
+          'consultationNote.counselor',
+        ],
+      },
     );
   }
 
@@ -272,9 +326,16 @@ export class BookingService {
     return createHash('sha256').update(plainToken).digest('hex');
   }
 
+  private toTrimmedString(value: unknown): string {
+    return typeof value === 'string' ? value.trim() : '';
+  }
+
   private deriveApplicantNameFromEmail(email: string) {
     const localPart = email.split('@')[0]?.trim() ?? '';
-    const normalized = localPart.replace(/[._-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const normalized = localPart
+      .replace(/[._-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
 
     if (normalized.length >= 2) {
       return normalized.slice(0, 100);
@@ -283,7 +344,7 @@ export class BookingService {
     return '예약자';
   }
 
-  private buildReservationUrl(plainToken: string) {
+  private buildReservationUrl(plainToken: string): string {
     const reserveBaseUrl = this.configService.get<string>(
       'APPLICANT_RESERVE_BASE_URL',
       'http://localhost:5174/reserve',
@@ -296,7 +357,7 @@ export class BookingService {
     targetEmail: string;
     reservationUrl: string;
     expiresAt: Date;
-  }) {
+  }): Promise<string> {
     const smtpUser = this.configService.get<string>('SMTP_USER');
     const smtpPass = this.configService.get<string>('SMTP_PASS');
 
@@ -304,11 +365,16 @@ export class BookingService {
       return 'SMTP 설정이 없어 메일 발송을 건너뛰었습니다.';
     }
 
-    const smtpHost = this.configService.get<string>('SMTP_HOST', 'smtp.gmail.com');
+    const smtpHost = this.configService.get<string>(
+      'SMTP_HOST',
+      'smtp.gmail.com',
+    );
     const smtpPort = this.configService.get<number>('SMTP_PORT', 465);
     const smtpSecure =
-      this.configService.get<string>('SMTP_SECURE', String(smtpPort === 465)) ===
-      'true';
+      this.configService.get<string>(
+        'SMTP_SECURE',
+        String(smtpPort === 465),
+      ) === 'true';
     const mailFrom = this.configService.get<string>('MAIL_FROM', smtpUser);
 
     const transporter = nodemailer.createTransport({
@@ -342,7 +408,9 @@ export class BookingService {
         `,
       });
     } catch {
-      throw new InternalServerErrorException('예약 링크 메일 발송에 실패했습니다.');
+      throw new InternalServerErrorException(
+        '예약 링크 메일 발송에 실패했습니다.',
+      );
     }
 
     return '예약 링크를 이메일로 전송했습니다.';
