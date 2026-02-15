@@ -1,6 +1,11 @@
 ﻿import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   CounselorScheduleSlot,
   CounselorScheduleSlotStatus,
@@ -51,14 +56,14 @@ export class ScheduleService {
     return slot;
   }
 
-  async findAll(query: FindSchedulesDto) {
+  async findAll(counselorId: number, query: FindSchedulesDto) {
     if (query.from >= query.to) {
       throw new BadRequestException('조회 기간이 올바르지 않습니다.');
     }
 
     return this.slotRepository.find(
       {
-        ...(query.counselorId ? { counselor: query.counselorId } : {}),
+        counselor: counselorId,
         startAt: {
           $gte: query.from,
           $lt: query.to,
@@ -71,10 +76,13 @@ export class ScheduleService {
     );
   }
 
-  async update(id: number, dto: UpdateScheduleDto) {
+  async update(counselorId: number, id: number, dto: UpdateScheduleDto) {
     const slot = await this.slotRepository.findOne({ id }, { populate: ['counselor'] });
     if (!slot) {
       throw new NotFoundException('스케줄을 찾을 수 없습니다.');
+    }
+    if (slot.counselor.id !== counselorId) {
+      throw new ForbiddenException('본인 스케줄만 수정할 수 있습니다.');
     }
 
     const nextStartAt = dto.startAt ?? slot.startAt;
@@ -101,10 +109,13 @@ export class ScheduleService {
     return slot;
   }
 
-  async remove(id: number) {
-    const slot = await this.slotRepository.findOne({ id });
+  async remove(counselorId: number, id: number) {
+    const slot = await this.slotRepository.findOne({ id }, { populate: ['counselor'] });
     if (!slot) {
       throw new NotFoundException('스케줄을 찾을 수 없습니다.');
+    }
+    if (slot.counselor.id !== counselorId) {
+      throw new ForbiddenException('본인 스케줄만 삭제할 수 있습니다.');
     }
 
     if (slot.bookedCount > 0) {

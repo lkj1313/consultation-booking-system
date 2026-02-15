@@ -36,17 +36,21 @@ export class ScheduleController {
   }
 
   @Get()
-  findAll(@Query() query: FindSchedulesDto) {
-    return this.scheduleService.findAll(query);
+  findAll(@Req() request: RequestWithUser, @Query() query: FindSchedulesDto) {
+    return this.scheduleService.findAll(request.user!.userId, query);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateScheduleDto) {
-    return this.scheduleService.update(id, dto);
+  update(
+    @Req() request: RequestWithUser,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateScheduleDto,
+  ) {
+    return this.scheduleService.update(request.user!.userId, id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.scheduleService.remove(id);
+  remove(@Req() request: RequestWithUser, @Param('id', ParseIntPipe) id: number) {
+    return this.scheduleService.remove(request.user!.userId, id);
   }
 }

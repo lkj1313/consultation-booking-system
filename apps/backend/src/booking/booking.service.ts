@@ -4,6 +4,7 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -106,7 +107,7 @@ export class BookingService {
     return slots.filter((slot) => slot.bookedCount < slot.capacity);
   }
 
-  async findBookings(query: FindBookingsDto) {
+  async findBookings(counselorId: number, query: FindBookingsDto) {
     if (query.from && query.to && query.from >= query.to) {
       throw new BadRequestException('조회 기간이 올바르지 않습니다.');
     }
@@ -125,11 +126,11 @@ export class BookingService {
         ...(query.counselorId || startAtFilter
           ? {
               slot: {
-                ...(query.counselorId ? { counselor: query.counselorId } : {}),
+                counselor: counselorId,
                 ...(startAtFilter ? { startAt: startAtFilter } : {}),
               },
             }
-          : {}),
+          : { slot: { counselor: counselorId } }),
       },
       {
         populate: [
@@ -227,17 +228,23 @@ export class BookingService {
     );
   }
 
-  async cancel(bookingId: number) {
+  async cancel(counselorId: number, bookingId: number) {
     const em = this.bookingRepository.getEntityManager();
     const result = await em.transactional(async (trxEm) => {
       const booking = await trxEm.findOne(
         Booking,
         { id: bookingId },
-        { populate: ['slot'], lockMode: LockMode.PESSIMISTIC_WRITE },
+        {
+          populate: ['slot', 'slot.counselor'],
+          lockMode: LockMode.PESSIMISTIC_WRITE,
+        },
       );
 
       if (!booking) {
         throw new NotFoundException('예약을 찾을 수 없습니다.');
+      }
+      if (booking.slot.counselor.id !== counselorId) {
+        throw new ForbiddenException('본인 스케줄 예약만 취소할 수 있습니다.');
       }
 
       const slot = await trxEm.findOne(
@@ -278,17 +285,25 @@ export class BookingService {
     );
   }
 
-  async complete(bookingId: number) {
+  async complete(counselorId: number, bookingId: number) {
     const em = this.bookingRepository.getEntityManager();
     const result = await em.transactional(async (trxEm) => {
       const booking = await trxEm.findOne(
         Booking,
         { id: bookingId },
-        { populate: ['slot'], lockMode: LockMode.PESSIMISTIC_WRITE },
+        {
+          populate: ['slot', 'slot.counselor'],
+          lockMode: LockMode.PESSIMISTIC_WRITE,
+        },
       );
 
       if (!booking) {
         throw new NotFoundException('예약을 찾을 수 없습니다.');
+      }
+      if (booking.slot.counselor.id !== counselorId) {
+        throw new ForbiddenException(
+          '본인 스케줄 예약만 완료 처리할 수 있습니다.',
+        );
       }
 
       if (booking.status === BookingStatus.CANCELLED) {
