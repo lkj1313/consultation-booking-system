@@ -3,7 +3,11 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { User, UserRole } from '../domain/entities/user.entity';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
@@ -31,7 +35,9 @@ export class AuthService {
   ) {}
 
   async register(dto: CreateAuthDto) {
-    const existingUser = await this.userRepository.findOne({ email: dto.email });
+    const existingUser = await this.userRepository.findOne({
+      email: dto.email,
+    });
 
     if (existingUser) {
       throw new ConflictException('이미 사용 중인 이메일입니다.');
@@ -61,7 +67,9 @@ export class AuthService {
     const user = await this.userRepository.findOne({ email: dto.email });
 
     if (!user || !this.verifyPassword(dto.password, user.passwordHash)) {
-      throw new UnauthorizedException('이메일 또는 비밀번호가 올바르지 않습니다.');
+      throw new UnauthorizedException(
+        '이메일 또는 비밀번호가 올바르지 않습니다.',
+      );
     }
 
     return this.issueTokens(user);
@@ -74,9 +82,12 @@ export class AuthService {
 
     try {
       const refreshSecret = this.getRefreshSecret();
-      const payload = await this.jwtService.verifyAsync<JwtPayload>(refreshToken, {
-        secret: refreshSecret,
-      });
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(
+        refreshToken,
+        {
+          secret: refreshSecret,
+        },
+      );
 
       const user = await this.userRepository.findOne({ id: payload.sub });
       if (!user) {
@@ -115,11 +126,17 @@ export class AuthService {
   }
 
   private getAccessSecret(): string {
-    return this.configService.get<string>('JWT_ACCESS_SECRET', 'dev-access-secret');
+    return this.configService.get<string>(
+      'JWT_ACCESS_SECRET',
+      'dev-access-secret',
+    );
   }
 
   private getRefreshSecret(): string {
-    return this.configService.get<string>('JWT_REFRESH_SECRET', 'dev-refresh-secret');
+    return this.configService.get<string>(
+      'JWT_REFRESH_SECRET',
+      'dev-refresh-secret',
+    );
   }
 
   private hashPassword(password: string): string {
