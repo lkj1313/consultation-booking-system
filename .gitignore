@@ -27,5 +27,4 @@ Microsoft/
 .pnpm-store/
 
 # local docs
-docs/HANDOFF.md
-docs/ORIGINAL_REQUIREMENTS.md
+docs/
