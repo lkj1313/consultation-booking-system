@@ -1,7 +1,13 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { EntityRepository, LockMode } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import nodemailer from 'nodemailer';
 import { CreateBookingLinkDto } from '@/booking/dto/create-booking-link.dto';
@@ -10,7 +16,10 @@ import { FindAvailableSlotsDto } from '@/booking/dto/find-available-slots.dto';
 import { FindBookingsDto } from '@/booking/dto/find-bookings.dto';
 import { Booking, BookingStatus } from '@/domain/entities/booking.entity';
 import { BookingLinkToken } from '@/domain/entities/booking-link-token.entity';
-import { CounselorScheduleSlot, CounselorScheduleSlotStatus } from '@/domain/entities/counselor-schedule-slot.entity';
+import {
+  CounselorScheduleSlot,
+  CounselorScheduleSlotStatus,
+} from '@/domain/entities/counselor-schedule-slot.entity';
 import { User } from '@/domain/entities/user.entity';
 
 @Injectable()
@@ -133,7 +142,9 @@ export class BookingService {
       );
       this.ensureBookingLinkUsable(bookingLinkToken);
 
-      const normalizedApplicantEmail = bookingLinkToken.targetEmail.trim().toLowerCase();
+      const normalizedApplicantEmail = bookingLinkToken.targetEmail
+        .trim()
+        .toLowerCase();
 
       const slot = await trxEm.findOne(
         CounselorScheduleSlot,
@@ -146,7 +157,9 @@ export class BookingService {
       }
 
       if (slot.counselor.id !== bookingLinkToken.counselor.id) {
-        throw new BadRequestException('해당 링크로 예약할 수 없는 스케줄입니다.');
+        throw new BadRequestException(
+          '해당 링크로 예약할 수 없는 스케줄입니다.',
+        );
       }
 
       if (slot.status !== CounselorScheduleSlotStatus.OPEN) {
@@ -167,7 +180,9 @@ export class BookingService {
 
       const booking = trxEm.create(Booking, {
         slot,
-        applicantName: bookingLinkToken.targetName.trim() || this.deriveApplicantNameFromEmail(normalizedApplicantEmail),
+        applicantName:
+          bookingLinkToken.targetName.trim() ||
+          this.deriveApplicantNameFromEmail(normalizedApplicantEmail),
         applicantEmail: normalizedApplicantEmail,
         applicantPhone: dto.applicantPhone?.trim() || null,
         status: BookingStatus.RESERVED,
@@ -274,7 +289,10 @@ export class BookingService {
 
   private deriveApplicantNameFromEmail(email: string) {
     const localPart = email.split('@')[0]?.trim() ?? '';
-    const normalized = localPart.replace(/[._-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const normalized = localPart
+      .replace(/[._-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
 
     if (normalized.length >= 2) {
       return normalized.slice(0, 100);
@@ -304,11 +322,16 @@ export class BookingService {
       return 'SMTP 설정이 없어 메일 발송을 건너뛰었습니다.';
     }
 
-    const smtpHost = this.configService.get<string>('SMTP_HOST', 'smtp.gmail.com');
+    const smtpHost = this.configService.get<string>(
+      'SMTP_HOST',
+      'smtp.gmail.com',
+    );
     const smtpPort = this.configService.get<number>('SMTP_PORT', 465);
     const smtpSecure =
-      this.configService.get<string>('SMTP_SECURE', String(smtpPort === 465)) ===
-      'true';
+      this.configService.get<string>(
+        'SMTP_SECURE',
+        String(smtpPort === 465),
+      ) === 'true';
     const mailFrom = this.configService.get<string>('MAIL_FROM', smtpUser);
 
     const transporter = nodemailer.createTransport({
@@ -342,7 +365,9 @@ export class BookingService {
         `,
       });
     } catch {
-      throw new InternalServerErrorException('예약 링크 메일 발송에 실패했습니다.');
+      throw new InternalServerErrorException(
+        '예약 링크 메일 발송에 실패했습니다.',
+      );
     }
 
     return '예약 링크를 이메일로 전송했습니다.';
