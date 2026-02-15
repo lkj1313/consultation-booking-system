@@ -5,3 +5,4 @@ export { AppShell } from './app-shell';
 export { DateTimePicker30m, type DateTimePicker30mProps } from './date-time-picker-30m';
 export { Input } from './input';
 export { Label } from './label';
+export { Modal } from './modal';

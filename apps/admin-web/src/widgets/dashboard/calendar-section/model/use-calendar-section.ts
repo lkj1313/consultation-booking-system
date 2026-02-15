@@ -18,14 +18,18 @@ import { useCancelBookingMutation } from "@/features/cancel-booking";
 import { useCompleteBookingMutation } from "@/features/complete-booking";
 import { useCreateScheduleMutation } from "@/features/create-schedule";
 import { useDeleteScheduleMutation } from "@/features/delete-schedule";
+import { useSaveConsultationNoteMutation } from "@/features/save-consultation-note";
 import { useUpdateScheduleStatusMutation } from "@/features/update-schedule-status";
 
-export const useCalendarSection = () => {
+export const useCalendarSection = (userId: number | null) => {
   const [now, setNow] = useState(() => new Date());
   const [viewMonth, setViewMonth] = useState(() => startOfMonth(new Date()));
   const [selectedDateKey, setSelectedDateKey] = useState("");
+  const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
+  const [selectedNoteBookingId, setSelectedNoteBookingId] = useState<number | null>(null);
   const [createTime, setCreateTime] = useState("09:00");
   const [createCapacity, setCreateCapacity] = useState(3);
+  const [noteEditorDraft, setNoteEditorDraft] = useState("");
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60_000);
@@ -38,8 +42,9 @@ export const useCalendarSection = () => {
     () => ({
       from: startOfMonth(viewMonth).toISOString(),
       to: startOfNextMonth(viewMonth).toISOString(),
+      ...(userId ? { counselorId: userId } : {}),
     }),
-    [viewMonth],
+    [userId, viewMonth],
   );
 
   const schedulesQuery = useSchedulesQuery(queryRange);
@@ -49,6 +54,7 @@ export const useCalendarSection = () => {
   const deleteScheduleMutation = useDeleteScheduleMutation();
   const cancelBookingMutation = useCancelBookingMutation();
   const completeBookingMutation = useCompleteBookingMutation();
+  const saveConsultationNoteMutation = useSaveConsultationNoteMutation();
 
   const schedules = schedulesQuery.data ?? [];
   const bookings = bookingsQuery.data ?? [];
@@ -103,6 +109,60 @@ export const useCalendarSection = () => {
       ),
     [selectedDateKey, visibleBookings],
   );
+  const selectedSlot = useMemo(
+    () => selectedSchedules.find((slot) => slot.id === selectedSlotId) ?? null,
+    [selectedSchedules, selectedSlotId],
+  );
+  const selectedSlotBookings = useMemo(
+    () =>
+      selectedSlotId === null
+        ? []
+        : selectedBookings.filter((booking) => booking.slot.id === selectedSlotId),
+    [selectedBookings, selectedSlotId],
+  );
+  const selectedNoteBooking = useMemo(
+    () =>
+      selectedNoteBookingId === null
+        ? null
+        : selectedSlotBookings.find((booking) => booking.id === selectedNoteBookingId) ?? null,
+    [selectedNoteBookingId, selectedSlotBookings],
+  );
+
+  useEffect(() => {
+    if (!selectedSlotId) {
+      setSelectedNoteBookingId(null);
+      setNoteEditorDraft("");
+      return;
+    }
+
+    if (!selectedSchedules.some((slot) => slot.id === selectedSlotId)) {
+      setSelectedSlotId(null);
+      setSelectedNoteBookingId(null);
+      setNoteEditorDraft("");
+    }
+  }, [selectedSchedules, selectedSlotId]);
+
+  useEffect(() => {
+    if (selectedSlotBookings.length === 0) {
+      setSelectedNoteBookingId(null);
+      return;
+    }
+
+    if (
+      selectedNoteBookingId &&
+      !selectedSlotBookings.some((booking) => booking.id === selectedNoteBookingId)
+    ) {
+      setSelectedNoteBookingId(null);
+    }
+  }, [selectedNoteBookingId, selectedSlotBookings]);
+
+  useEffect(() => {
+    if (!selectedNoteBooking) {
+      setNoteEditorDraft("");
+      return;
+    }
+    setNoteEditorDraft(selectedNoteBooking.consultationNote?.note ?? "");
+  }, [selectedNoteBooking]);
 
   const createTimeOptions = useMemo(() => {
     if (!selectedDateKey) {
@@ -165,6 +225,14 @@ export const useCalendarSection = () => {
     viewMonth,
     selectedDateKey,
     setSelectedDateKey,
+    selectedSlotId,
+    setSelectedSlotId,
+    selectedSlot,
+    selectedNoteBookingId,
+    setSelectedNoteBookingId,
+    selectedNoteBooking,
+    noteEditorDraft,
+    setNoteEditorDraft,
     createTime,
     setCreateTime,
     createCapacity,
@@ -177,14 +245,15 @@ export const useCalendarSection = () => {
     deleteScheduleMutation,
     cancelBookingMutation,
     completeBookingMutation,
+    saveConsultationNoteMutation,
     scheduleCountByDate,
     bookingCountByDate,
     selectedSchedules,
     selectedBookings,
+    selectedSlotBookings,
     createTimeOptions,
     isSelectedDatePast,
     moveMonth,
     createSchedule,
   };
 };
-

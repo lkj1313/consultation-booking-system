@@ -9,4 +9,5 @@ export {
   DateTimePicker30m,
   Input,
   Label,
+  Modal,
 } from '@consult/shared-ui';
