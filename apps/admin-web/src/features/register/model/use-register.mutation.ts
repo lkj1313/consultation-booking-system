@@ -31,7 +31,7 @@ export const useRegisterMutation = (
   return useMutation<RegisterUserResponse, unknown, RegisterUserPayload>({
     mutationFn: registerUser,
     onSuccess: (data) => {
-      toast.success('사용자 등록이 완료되었습니다.');
+      toast.success('상담사 등록이 완료되었습니다.');
       onSuccess?.(data);
     },
     onError: (error) => {

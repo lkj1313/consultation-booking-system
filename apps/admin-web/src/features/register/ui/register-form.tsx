@@ -30,14 +30,14 @@ export const RegisterForm = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">사용자 계정 생성</CardTitle>
-        <CardDescription>관리자 권한 계정을 등록합니다.</CardDescription>
+        <CardTitle className="text-xl">상담사 계정 생성</CardTitle>
+        <CardDescription>상담사 권한 계정을 등록합니다.</CardDescription>
       </CardHeader>
       <CardContent>
         <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="email">이메일</Label>
-            <Input id="email" type="email" placeholder="admin@example.com" {...register('email')} />
+            <Input id="email" type="email" placeholder="counselor@example.com" {...register('email')} />
             {formState.errors.email && (
               <p className="text-xs text-rose-600">{formState.errors.email.message}</p>
             )}
@@ -58,14 +58,14 @@ export const RegisterForm = () => {
 
           <div className="space-y-2">
             <Label htmlFor="name">이름</Label>
-            <Input id="name" type="text" placeholder="운영자 이름" {...register('name')} />
+            <Input id="name" type="text" placeholder="상담사 이름" {...register('name')} />
             {formState.errors.name && (
               <p className="text-xs text-rose-600">{formState.errors.name.message}</p>
             )}
           </div>
 
           <Button type="submit" className="w-full" disabled={mutation.isPending}>
-            {mutation.isPending ? '등록 중...' : '사용자 등록'}
+            {mutation.isPending ? '등록 중...' : '상담사 등록'}
           </Button>
         </form>
 

@@ -37,14 +37,14 @@ export const LoginForm = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">관리자 로그인</CardTitle>
-        <CardDescription>관리자 페이지 접근을 위해 로그인해 주세요.</CardDescription>
+        <CardTitle className="text-xl">상담사 로그인</CardTitle>
+        <CardDescription>상담사 페이지 접근을 위해 로그인해 주세요.</CardDescription>
       </CardHeader>
       <CardContent>
         <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="email">이메일</Label>
-            <Input id="email" type="email" placeholder="admin@example.com" {...register('email')} />
+            <Input id="email" type="email" placeholder="counselor@example.com" {...register('email')} />
             {formState.errors.email && (
               <p className="text-xs text-rose-600">{formState.errors.email.message}</p>
             )}
@@ -66,7 +66,7 @@ export const LoginForm = () => {
         <p className="mt-4 text-sm text-slate-600">
           계정이 없다면{' '}
           <Link to="/register" className="font-medium text-slate-900 underline">
-            사용자 등록
+            상담사 등록
           </Link>
           을 진행하세요.
         </p>
