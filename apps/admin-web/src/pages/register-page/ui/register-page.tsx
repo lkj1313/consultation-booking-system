@@ -4,8 +4,8 @@ import { RegisterForm } from "@/features/register";
 export const RegisterPage = () => {
   return (
     <AppShell
-      title="관리자 사용자 등록"
-      subtitle="운영 담당자 계정을 생성하고 권한을 부여합니다."
+      title="상담사 등록"
+      subtitle="상담사 계정을 생성하고 로그인할 수 있습니다."
       maxWidthClassName="max-w-md"
       className="flex items-center justify-center py-0 md:py-0"
     >
