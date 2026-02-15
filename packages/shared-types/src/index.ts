@@ -19,6 +19,13 @@ export interface ScheduleSlot {
 
 export type BookingStatus = "reserved" | "cancelled" | "completed";
 
+export interface ConsultationNoteItem {
+  id: number;
+  note: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface BookingItem {
   id: number;
   applicantName: string;
@@ -26,6 +33,7 @@ export interface BookingItem {
   applicantPhone?: string | null;
   status: BookingStatus;
   slot: ScheduleSlot;
+  consultationNote?: ConsultationNoteItem | null;
 }
 
 export interface ScheduleQuery {
@@ -75,6 +83,11 @@ export interface CreateBookingLinkResponse {
   expiresAt: string;
   reservationUrl: string;
   message: string;
+}
+
+export interface UpsertConsultationNoteRequest {
+  bookingId: number;
+  note: string;
 }
 
 export interface LoginRequest {

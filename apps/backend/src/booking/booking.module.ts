@@ -11,7 +11,12 @@ import { BookingService } from './booking.service';
 
 @Module({
   imports: [
-    MikroOrmModule.forFeature([Booking, CounselorScheduleSlot, BookingLinkToken, User]),
+    MikroOrmModule.forFeature([
+      Booking,
+      CounselorScheduleSlot,
+      BookingLinkToken,
+      User,
+    ]),
     AuthModule,
   ],
   controllers: [BookingController, BookingLinkController],

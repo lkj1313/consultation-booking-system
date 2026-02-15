@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BookingModule } from './booking/booking.module';
+import { ConsultationNoteModule } from './consultation-note/consultation-note.module';
 import { buildMikroOrmConfig } from './config/mikro-orm.config';
 import { ScheduleModule } from './schedule/schedule.module';
 
@@ -23,6 +24,7 @@ import { ScheduleModule } from './schedule/schedule.module';
     }),
     AuthModule,
     BookingModule,
+    ConsultationNoteModule,
     ScheduleModule,
   ],
   controllers: [AppController],

@@ -1,5 +1,11 @@
-import { WEEKDAY_LABELS_KO, formatMonthTitle, isPastDate, toDateKey } from "@consult/shared-lib";
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui";
+import {
+  WEEKDAY_LABELS_KO,
+  formatDateTimeNoYear,
+  formatMonthTitle,
+  isPastDate,
+  toDateKey,
+} from "@consult/shared-lib";
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Modal } from "@/shared/ui";
 import type { BookingItem } from "@/entities/booking";
 import type { ScheduleSlot } from "@/entities/schedule";
 import { useCalendarSection } from "../model/use-calendar-section";
@@ -20,23 +26,20 @@ const formatDateNoYear = (dateKey: string) => {
   });
 };
 
-const formatDateTimeNoYear = (iso: string) =>
-  new Date(iso).toLocaleString("ko-KR", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-
 export const CalendarSection = ({ isAdmin, userId }: CalendarSectionProps) => {
-  void userId;
-
   const {
     todayStart,
     viewMonth,
     selectedDateKey,
     setSelectedDateKey,
+    selectedSlotId,
+    setSelectedSlotId,
+    selectedSlot,
+    selectedNoteBookingId,
+    setSelectedNoteBookingId,
+    selectedNoteBooking,
+    noteEditorDraft,
+    setNoteEditorDraft,
     createTime,
     setCreateTime,
     createCapacity,
@@ -49,19 +52,30 @@ export const CalendarSection = ({ isAdmin, userId }: CalendarSectionProps) => {
     deleteScheduleMutation,
     cancelBookingMutation,
     completeBookingMutation,
+    saveConsultationNoteMutation,
     scheduleCountByDate,
     bookingCountByDate,
     selectedSchedules,
-    selectedBookings,
+    selectedSlotBookings,
     createTimeOptions,
     isSelectedDatePast,
     moveMonth,
     createSchedule,
-  } = useCalendarSection();
+  } = useCalendarSection(userId);
 
-  const renderScheduleItem = (slot: ScheduleSlot) => (
-    <div key={slot.id} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+  const renderScheduleItem = (slot: ScheduleSlot) => {
+    const isSelected = selectedSlotId === slot.id;
+
+    return (
+      <button
+        key={slot.id}
+        type="button"
+        onClick={() => setSelectedSlotId(slot.id)}
+        className={`w-full rounded-xl border bg-white px-3 py-2 text-left text-sm transition ${
+          isSelected ? "border-cyan-400 bg-cyan-50" : "border-slate-200 hover:border-slate-300"
+        }`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="font-medium text-slate-900">
             {formatDateTimeNoYear(slot.startAt)} - {formatDateTimeNoYear(slot.endAt)} · {slot.counselor.name} 상담
@@ -69,9 +83,15 @@ export const CalendarSection = ({ isAdmin, userId }: CalendarSectionProps) => {
           <p className="text-slate-600">
             상태: {slot.status} · 예약 {slot.bookedCount}/{slot.capacity}
           </p>
+          <p className="text-xs text-slate-500">클릭하면 해당 슬롯 예약 내역을 볼 수 있습니다.</p>
         </div>
         {isAdmin && (
-          <div className="flex gap-2">
+          <div
+            className="flex gap-2"
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
             <Button
               type="button"
               variant="outline"
@@ -89,39 +109,65 @@ export const CalendarSection = ({ isAdmin, userId }: CalendarSectionProps) => {
             </Button>
           </div>
         )}
-      </div>
-    </div>
-  );
+        </div>
+      </button>
+    );
+  };
 
-  const renderBookingItem = (booking: BookingItem) => (
-    <div key={booking.id} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="font-medium text-slate-900">
-            {formatDateTimeNoYear(booking.slot.startAt)} · {booking.applicantName} ({booking.applicantEmail})
-          </p>
-          <p className="text-slate-600">상태: {booking.status}</p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={booking.status !== "reserved" || cancelBookingMutation.isPending}
-            onClick={() => cancelBookingMutation.mutate(booking.id)}
-          >
-            취소
-          </Button>
-          <Button
-            type="button"
-            disabled={booking.status !== "reserved" || completeBookingMutation.isPending}
-            onClick={() => completeBookingMutation.mutate(booking.id)}
-          >
-            완료
-          </Button>
+  const renderBookingItem = (booking: BookingItem) => {
+    const applicantName =
+      booking.applicantName?.trim() || booking.applicantEmail.split("@")[0]?.trim() || "신청자";
+    const isSelected = selectedNoteBookingId === booking.id;
+
+    return (
+      <div key={booking.id} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="font-medium text-slate-900">
+              {formatDateTimeNoYear(booking.slot.startAt)} · 신청자 {applicantName}
+            </p>
+            <p className="text-slate-600">이메일: {booking.applicantEmail}</p>
+            <p className="text-slate-600">상태: {booking.status}</p>
+            <p className="text-xs text-slate-500">
+              상담 이력: {booking.consultationNote?.note ? "작성됨" : "없음"}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11"
+              onClick={() => setSelectedNoteBookingId(booking.id)}
+            >
+              {isSelected ? "이력 작성 중" : "이력 작성"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={booking.status !== "reserved" || cancelBookingMutation.isPending}
+              onClick={() => cancelBookingMutation.mutate(booking.id)}
+            >
+              취소
+            </Button>
+            <Button
+              type="button"
+              disabled={booking.status !== "reserved" || completeBookingMutation.isPending}
+              onClick={() => completeBookingMutation.mutate(booking.id)}
+            >
+              완료
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  const selectedNoteBookingName = selectedNoteBooking
+    ? selectedNoteBooking.applicantName?.trim() ||
+      selectedNoteBooking.applicantEmail.split("@")[0]?.trim() ||
+      "신청자"
+    : "";
+  const isSelectedNoteBookingCompleted = selectedNoteBooking?.status === "completed";
 
   return (
     <div className="space-y-4">
@@ -167,6 +213,7 @@ export const CalendarSection = ({ isAdmin, userId }: CalendarSectionProps) => {
                   onClick={() => {
                     if (!pastDate) {
                       setSelectedDateKey(key);
+                      setSelectedSlotId(null);
                     }
                   }}
                   className={`h-24 rounded-lg border p-2 text-left transition ${
@@ -244,19 +291,79 @@ export const CalendarSection = ({ isAdmin, userId }: CalendarSectionProps) => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">선택 날짜 예약</CardTitle>
-            <CardDescription>{formatDateNoYear(selectedDateKey)}</CardDescription>
+            <CardTitle className="text-lg">선택 슬롯 예약 내역</CardTitle>
+            <CardDescription>
+              {selectedSlot
+                ? `${formatDateTimeNoYear(selectedSlot.startAt)} - ${formatDateTimeNoYear(selectedSlot.endAt)}`
+                : "스케줄을 클릭하면 해당 슬롯 예약 내역이 표시됩니다."}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {bookingsQuery.isLoading && <p className="text-sm text-slate-500">예약 불러오는 중...</p>}
             {bookingsQuery.isError && <p className="text-sm text-rose-600">예약 조회에 실패했습니다.</p>}
-            {!bookingsQuery.isLoading && !bookingsQuery.isError && selectedBookings.length === 0 && (
-              <p className="text-sm text-slate-600">선택한 날짜의 예약이 없습니다.</p>
+            {!bookingsQuery.isLoading && !bookingsQuery.isError && !selectedSlot && (
+              <p className="text-sm text-slate-600">왼쪽 스케줄에서 시간대를 선택해 주세요.</p>
             )}
-            {selectedBookings.map(renderBookingItem)}
+            {!bookingsQuery.isLoading &&
+              !bookingsQuery.isError &&
+              selectedSlot &&
+              selectedSlotBookings.length === 0 && (
+                <p className="text-sm text-slate-600">선택한 슬롯의 예약이 없습니다.</p>
+              )}
+            {selectedSlotBookings.map(renderBookingItem)}
           </CardContent>
         </Card>
       </div>
+
+      <Modal
+        open={Boolean(selectedNoteBooking)}
+        title={selectedNoteBooking ? `상담 이력 작성 · ${selectedNoteBookingName}` : "상담 이력 작성"}
+        description={
+          selectedNoteBooking
+            ? `${formatDateTimeNoYear(selectedNoteBooking.slot.startAt)} · 상태 ${selectedNoteBooking.status}`
+            : undefined
+        }
+        onClose={() => setSelectedNoteBookingId(null)}
+        footer={
+          <Button
+            type="button"
+            className="h-11 px-4"
+            disabled={
+              !isSelectedNoteBookingCompleted ||
+              noteEditorDraft.trim().length === 0 ||
+              saveConsultationNoteMutation.isPending ||
+              !selectedNoteBooking
+            }
+            onClick={() =>
+              selectedNoteBooking &&
+              saveConsultationNoteMutation.mutate(
+                {
+                  bookingId: selectedNoteBooking.id,
+                  note: noteEditorDraft.trim(),
+                },
+                {
+                  onSuccess: () => setSelectedNoteBookingId(null),
+                },
+              )
+            }
+          >
+            이력 저장
+          </Button>
+        }
+      >
+        <p className="text-sm text-slate-600">
+          {isSelectedNoteBookingCompleted
+            ? "상담 완료 상태입니다. 상담 이력을 저장할 수 있습니다."
+            : "상담 완료 상태에서만 이력 저장이 가능합니다."}
+        </p>
+        <textarea
+          value={noteEditorDraft}
+          onChange={(event) => setNoteEditorDraft(event.target.value)}
+          placeholder="상담 내용, 후속 조치, 다음 일정 등을 기록하세요."
+          disabled={!isSelectedNoteBookingCompleted}
+          className="mt-3 min-h-40 w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm outline-none focus:border-cyan-400 disabled:bg-slate-100"
+        />
+      </Modal>
     </div>
   );
 };
