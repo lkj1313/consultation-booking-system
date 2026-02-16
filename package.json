@@ -6,7 +6,11 @@
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "db:up": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/db.ps1 up",
+    "db:down": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/db.ps1 down",
+    "db:logs": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/db.ps1 logs",
+    "db:status": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/db.ps1 status"
   },
   "devDependencies": {
     "turbo": "^2.5.6"
